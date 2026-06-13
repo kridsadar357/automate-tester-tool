@@ -1,27 +1,46 @@
 #!/usr/bin/env bun
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import type { Suite } from "./types";
 import { runSuite } from "./runner";
 import { printResult, printSummary } from "./report";
+import { renderHtml } from "./html-report";
 
 async function main() {
-  const file = process.argv[2];
-  if (!file) {
-    console.error("usage: apitest <suite.json>");
-    process.exit(2);
-  }
-  let suite: Suite;
-  try {
-    suite = JSON.parse(readFileSync(file, "utf8")) as Suite;
-  } catch (e) {
-    console.error(`ไม่สามารถอ่าน suite "${file}": ${e instanceof Error ? e.message : e}`);
-    process.exit(2);
+  const args = process.argv.slice(2);
+  let suiteFile: string | undefined;
+  let htmlOutFile: string | undefined;
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--html") {
+      htmlOutFile = args[i + 1];
+      i++;
+    } else if (!suiteFile) {
+      suiteFile = args[i];
+    }
   }
 
-  console.log(`\n▶ ${suite.name} ${suite.baseUrl ? `(${suite.baseUrl})` : ""}`);
-  const results = await runSuite(suite, { onResult: printResult });
-  const { failed } = printSummary(suite.name, results);
-  process.exit(failed === 0 ? 0 : 1);
+  if (!suiteFile) {
+    console.error("Usage: bun run src/cli.ts <suite.json> [--html report.html]");
+    process.exit(1);
+  }
+
+  const suite: Suite = JSON.parse(readFileSync(suiteFile, "utf-8"));
+  const results = await runSuite(suite);
+
+  for (const result of results) {
+    printResult(result);
+  }
+
+  printSummary(suite.name, results);
+
+  if (htmlOutFile) {
+    const html = renderHtml(suite, results);
+    writeFileSync(htmlOutFile, html, "utf-8");
+    console.log(`\nHTML report written to ${htmlOutFile}`);
+  }
 }
 
-void main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
