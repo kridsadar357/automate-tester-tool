@@ -1,0 +1,17 @@
+{
+  "name": "automate-tester-tool",
+  "version": "0.1.0",
+  "description": "Declarative API test runner — define suites in JSON, assert status/json/headers/latency, chain variables across requests.",
+  "type": "module",
+  "bin": { "apitest": "./src/cli.ts" },
+  "scripts": {
+    "start": "bun run src/cli.ts",
+    "example": "bun run src/cli.ts suites/example.json",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}

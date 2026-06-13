@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# builds / output
+dist/
+build/
+out/
+.next/
+target/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp

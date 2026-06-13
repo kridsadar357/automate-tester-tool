@@ -1,0 +1,31 @@
+{
+  "name": "JSONPlaceholder smoke suite",
+  "baseUrl": "https://jsonplaceholder.typicode.com",
+  "headers": { "accept": "application/json" },
+  "variables": { "postId": 1 },
+  "tests": [
+    {
+      "name": "GET a post",
+      "path": "/posts/{{postId}}",
+      "expect": { "status": 200, "json": { "id": 1, "userId": 1 }, "maxMs": 8000 },
+      "save": { "title": "json.title", "uid": "json.userId" }
+    },
+    {
+      "name": "GET comments for the post",
+      "path": "/posts/{{postId}}/comments",
+      "expect": { "status": 200 }
+    },
+    {
+      "name": "GET the author (chained from saved uid)",
+      "path": "/users/{{uid}}",
+      "expect": { "status": 200, "json": { "id": 1 } }
+    },
+    {
+      "name": "CREATE a post",
+      "method": "POST",
+      "path": "/posts",
+      "body": { "title": "riki", "body": "hello from automate-tester-tool", "userId": "{{uid}}" },
+      "expect": { "status": 201, "json": { "title": "riki" } }
+    }
+  ]
+}
